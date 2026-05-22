@@ -1,10 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useState } from "react";
-import {
-  getCmsCollection,
-  type CmsResponse,
-  type CmsResult,
-} from "../services/api";
+import { getCmsCollectionBySlug } from "../services/api";
+import type { DeliveryAPIPayload } from "../utils/types";
 
 export type HeroStep = {
   id: string;
@@ -71,11 +68,14 @@ export type HomePageData = {
   media?: string;
 };
 
+const HOME_ENDPOINT = "home";
+export const HOME_SLUG = "principal";
+
 function adaptToHomeData(
-  result: CmsResult<HomePageData> | undefined,
+  payload: DeliveryAPIPayload | null | undefined,
 ): HomeData | null {
-  if (!result) return null;
-  const d = result.data ?? {};
+  if (!payload) return null;
+  const d = (payload.data ?? {}) as HomePageData;
 
   const hero: Hero | null = d.hero_title
     ? {
@@ -107,9 +107,10 @@ export function useHome(): UseHomeResult {
     setIsLoading(true);
     setError(null);
     try {
-      const response: CmsResponse<HomePageData> =
-        await getCmsCollection<HomePageData>("home", { signal });
-      setData(adaptToHomeData(response.results[0]));
+      const result = await getCmsCollectionBySlug(HOME_ENDPOINT, HOME_SLUG, {
+        signal,
+      });
+      setData(adaptToHomeData(result));
     } catch (err) {
       if (err instanceof Error && err.name === "CanceledError") return;
       setError(err instanceof Error ? err : new Error(String(err)));

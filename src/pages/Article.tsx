@@ -1,25 +1,46 @@
-import { useParams } from 'react-router-dom'
-import { useArticle } from '../hooks/useArticle'
+import { useParams } from "react-router-dom";
+import { EditorContent, useEditor, type Content } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
+import { useArticle } from "../hooks/useArticle";
+
+function RenderTiptapContent({ content }: { content: Content }) {
+  const editor = useEditor({
+    editable: false,
+    content,
+    extensions: [StarterKit, Link],
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-invert max-w-none text-sm leading-relaxed text-blaze-muted",
+      },
+    },
+  });
+
+  return <EditorContent editor={editor} />;
+}
 
 const fallback = {
   title:
-    'Final da Liga Europa 2025/26: Veja que é o Favorito entre Freiburg e Aston Villa e Onde Assistir!',
-  date: '2026-05-20',
-  dateLabel: '2026 maio 20',
+    "Final da Liga Europa 2025/26: Veja que é o Favorito entre Freiburg e Aston Villa e Onde Assistir!",
+  date: "2026-05-20",
   shareUrls: {
-    twitter: '#share-twitter',
-    facebook: '#share-facebook',
+    twitter: "#share-twitter",
+    facebook: "#share-facebook",
   },
-}
+};
 
 function Article() {
-  const { slug } = useParams<{ slug: string }>()
-  const { data } = useArticle(slug)
+  const { slug } = useParams<{ slug: string }>();
+  const { data } = useArticle(slug);
 
-  const title = data?.title ?? fallback.title
-  const date = data?.date ?? fallback.date
-  const dateLabel = data?.dateLabel ?? fallback.dateLabel
-  const shareUrls = data?.shareUrls ?? fallback.shareUrls
+  const title = data?.article_title.text ?? fallback.title;
+  const date = data?.article_date ?? fallback.date;
+  const banner = data?.article_banner;
+  const shareUrls = fallback.shareUrls;
+  const content = data?.article_main_content;
+
+  console.log({ content, data });
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-8">
@@ -32,7 +53,7 @@ function Article() {
           dateTime={date}
           className="mt-6 inline-block text-xs font-bold uppercase tracking-wider text-blaze-red"
         >
-          {dateLabel}
+          {date}
         </time>
 
         <div
@@ -61,18 +82,25 @@ function Article() {
       </header>
 
       <figure className="mt-8">
-        <div
+        <img
+          src={banner}
           aria-hidden="true"
           className="aspect-[16/9] w-full overflow-hidden rounded-lg bg-blaze-surface-2"
         />
       </figure>
 
-      <div className="mx-auto mt-8 max-w-2xl space-y-4 text-justify text-sm leading-relaxed text-blaze-muted">
+      {content ? (
+        <div className="mx-auto mt-8 max-w-2xl">
+          <RenderTiptapContent content={content as Content} />
+        </div>
+      ) : null}
+
+      {/* <div className="mx-auto mt-8 max-w-2xl space-y-4 text-justify text-sm leading-relaxed text-blaze-muted">
         <p>
           O Freiburg, da Alemanha, e o Aston Villa, da Inglaterra, jogam a
           grande decisão da Liga Europa 2025/26. Com a promessa de um grande
           espetáculo do futebol, a partida da final oferece também momentos de
-          diversão para os fãs do esporte mais popular do mundo com as{' '}
+          diversão para os fãs do esporte mais popular do mundo com as{" "}
           <a
             href="#apostas"
             className="font-semibold text-blaze-red underline-offset-2 hover:underline"
@@ -114,9 +142,9 @@ function Article() {
           Nesta temporada continental, durante a fase de liga, o Aston Villa
           ficou em 2º lugar, enquanto o Freiburg ficou em 7º, levando ambos
           direto às oitavas de final. No mata-mata, os ingleses eliminaram o
-          francês Lille, depois passaram pelo italiano Bologna e, na
-          semifinal, num duelo da Inglaterra, passaram pelo Nottingham Forest,
-          virando o agregado no jogo de volta.
+          francês Lille, depois passaram pelo italiano Bologna e, na semifinal,
+          num duelo da Inglaterra, passaram pelo Nottingham Forest, virando o
+          agregado no jogo de volta.
         </p>
 
         <p>
@@ -125,9 +153,9 @@ function Article() {
           espanhol Celta de Vigo duas vezes, terminando com outra virada, nas
           semis, agora diante do Braga, de Portugal.
         </p>
-      </div>
+      </div> */}
     </article>
-  )
+  );
 }
 
-export default Article
+export default Article;

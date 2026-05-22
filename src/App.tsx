@@ -1,5 +1,5 @@
-import { Link, Outlet } from 'react-router-dom'
-import { Button } from './components/ui/Button'
+import { Link, Outlet } from "react-router-dom";
+import { Button } from "./components/ui/Button";
 
 function App() {
   return (
@@ -280,7 +280,7 @@ function App() {
           </details>
         </aside>
 
-        <main className="min-w-0 flex-1 space-y-6 px-6 py-6">
+        <main className="min-w-0 flex-1 space-y-6 px-6 py-6 mx-[5%]">
           <Outlet />
         </main>
       </div>

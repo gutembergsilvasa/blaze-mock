@@ -1,8 +1,12 @@
 import axios, { type AxiosRequestConfig } from "axios";
+import type {
+  DeliveryAPIPayload,
+  DeliveryByTypeAPIPayload,
+} from "../utils/types";
 
 const CMS_API_TOKEN =
   import.meta.env.VITE_CMS_API_TOKEN ??
-  "cms_1603b8ec37d38b8236a32ab26eb144f63da6da77a08fe3edbe9aab92440545e4";
+  "cms_a7ef14110b75651524deb928fe1440a61deaf446a161b44d7915b4bf93a4a639";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "/api",
@@ -90,9 +94,34 @@ export async function del<T>(
   return data;
 }
 
-export async function getCmsCollection<TData = Record<string, unknown>>(
+export async function getCmsCollectionByType(
   type: string,
   config?: AxiosRequestConfig,
-): Promise<CmsResponse<TData>> {
-  return get<CmsResponse<TData>>(`/delivery/${type}?images=original`, config);
+): Promise<DeliveryByTypeAPIPayload> {
+  return get<DeliveryByTypeAPIPayload>(
+    `/delivery/${type}?images=original`,
+    config,
+  );
+}
+
+export async function getCmsCollectionBySlug(
+  type: string,
+  slug: string,
+  config?: AxiosRequestConfig,
+): Promise<DeliveryAPIPayload> {
+  return get<DeliveryAPIPayload>(
+    `/delivery/${type}/${slug}?images=original`,
+    config,
+  );
+}
+
+export async function getCmsCollectionByTag(
+  type: string,
+  tag: string,
+  config?: AxiosRequestConfig,
+): Promise<DeliveryAPIPayload> {
+  return get<DeliveryAPIPayload>(
+    `/delivery/${type}/tag/${tag}?images=original`,
+    config,
+  );
 }

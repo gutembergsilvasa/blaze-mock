@@ -2,99 +2,89 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "../lib/cn";
 import {
+  SECAO_INCIAL,
   useBlog,
-  type BlogArticle,
-  type Category,
-  type CategoryId,
+  type BlogPostData,
   type FeaturedArticle,
 } from "../hooks/useBlog";
 
-const fallbackCategories: Category[] = [
-  { id: "all", label: "All Articles" },
-  { id: "esportes", label: "Esportes", count: 353 },
-  { id: "esports", label: "Esports", count: 58 },
-  { id: "cassino-online", label: "Cassino Online", count: 55 },
-  { id: "enciclopedia", label: "Enciclopédia das Apostas", count: 43 },
-  { id: "curadoria", label: "Curadoria da Blaze", count: 24 },
-  { id: "leituras-essenciais", label: "Leituras Essenciais" },
-];
+function FeaturedBanner({ featured }: { featured: FeaturedArticle }) {
+  const href = `/article/${featured.slug ?? featured.id}`;
+  const TitleTag = (featured.titleTag === "h1" ? "h1" : "h2") as "h1" | "h2";
 
-const fallbackFeatured: FeaturedArticle = {
-  id: "a1",
-  date: "2026-05-20",
-  dateLabel: "2026 maio 20",
-  title:
-    "Final da Liga Europa 2025/26: Veja que é o Favorito entre Freiburg e Aston Villa e Onde Assistir!",
-  description:
-    "Começou a época das finais dos continentais europeus, com a grande decisão da Liga Europa 2025/26 abrindo as últimas semanas da temporada do futebol do Velho Continente!",
-  category: "esportes",
-};
+  return (
+    <article
+      aria-labelledby="featured-title"
+      className="grid overflow-hidden lg:grid-cols-[2fr_3fr]"
+    >
+      <Link to={href} aria-label={featured.title} className="block">
+        {featured.image ? (
+          <img
+            src={featured.image}
+            alt=""
+            className="aspect-[16/10] w-full object-cover lg:aspect-auto lg:h-full"
+          />
+        ) : (
+          <div
+            aria-hidden="true"
+            className="aspect-[16/10] w-full bg-blaze-surface-2 lg:aspect-auto lg:h-full"
+          />
+        )}
+      </Link>
 
-const fallbackArticles: BlogArticle[] = [
-  {
-    id: "a1",
-    date: "2026-05-20",
-    dateLabel: "2026 maio 20",
-    title:
-      "Final da Liga Europa 2025/26: Veja que é o Favorito entre Freiburg e Aston Villa e Onde Assistir!",
-    category: "esportes",
-  },
-  {
-    id: "a2",
-    date: "2026-05-19",
-    dateLabel: "2026 maio 19",
-    title:
-      "DreamLeague Season 29: guia completo do torneio de Dota 2, favoritos e onde assistir!",
-    category: "esports",
-    tags: ["esports"],
-  },
-  {
-    id: "a3",
-    date: "2026-05-18",
-    dateLabel: "2026 maio 18",
-    title: "“Eu tô no jogo”, diz Neymar ao vestir a camisa do Jogo Responsável",
-    category: "leituras-essenciais",
-    tags: ["jogo responsável", "leituras essenciais"],
-  },
-  {
-    id: "a4",
-    date: "2026-05-17",
-    dateLabel: "2026 maio 17",
-    title:
-      "Estratégias de Blackjack para iniciantes: como começar a jogar com segurança",
-    category: "cassino-online",
-    tags: ["cassino"],
-  },
-  {
-    id: "a5",
-    date: "2026-05-16",
-    dateLabel: "2026 maio 16",
-    title:
-      "O que é handicap asiático? Entenda o tipo de aposta mais usado no futebol",
-    category: "enciclopedia",
-    tags: ["glossário"],
-  },
-  {
-    id: "a6",
-    date: "2026-05-15",
-    dateLabel: "2026 maio 15",
-    title: "Os 5 melhores slots em destaque na Blaze neste mês",
-    category: "curadoria",
-    tags: ["slots"],
-  },
-];
+      <div className="flex flex-col justify-center gap-5 p-8 lg:p-12">
+        <time
+          dateTime={featured.date}
+          className="text-xs font-bold uppercase tracking-wider text-blaze-red"
+        >
+          {featured.date}
+        </time>
+        <TitleTag
+          id="featured-title"
+          className="text-3xl font-bold leading-[1.15] text-white lg:text-4xl"
+        >
+          <Link to={href} className="hover:text-white/90">
+            {featured.title}
+          </Link>
+        </TitleTag>
+        <p className="text-sm leading-relaxed text-blaze-muted">
+          {featured.description}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+const ALL = "all" as const;
 
 function Blog() {
-  const { data } = useBlog();
+  const { data, articles } = useBlog();
+  const [active, setActive] = useState<string>(ALL);
 
-  const featured = data?.featured ?? fallbackFeatured;
-  const categories = data?.categories ?? fallbackCategories;
-  const articles = data?.articles ?? fallbackArticles;
+  const postData = data?.data as BlogPostData | undefined;
 
-  const [active, setActive] = useState<CategoryId>("all");
+  console.log({ articles });
 
   const visible =
-    active === "all" ? articles : articles.filter((a) => a.category === active);
+    active === ALL ? articles : articles.filter((a) => a.tags.includes(active));
+
+  const banner_principal_data = postData?.banner_principal_data ?? "";
+  const banner_principal_img = postData?.banner_principal_img ?? "";
+  const banner_principal_descricao = postData?.banner_principal_descricao;
+  const banner_principal_texto = postData?.banner_principal_texto;
+  const tags = data?.tags ?? [];
+
+  const banner: FeaturedArticle = {
+    id: data?.id,
+    slug: data?.uid ?? SECAO_INCIAL,
+    date: banner_principal_data,
+    title: banner_principal_texto?.text || "",
+    tags,
+    image: banner_principal_img,
+    description: banner_principal_descricao?.text || "",
+    titleTag: banner_principal_texto?.semanticTag,
+    descriptionTag: banner_principal_descricao?.semanticTag,
+  };
 
   return (
     <div className="space-y-10 pt-4 pb-12">
@@ -103,44 +93,7 @@ function Blog() {
       </header>
 
       {/* Artigo em destaque */}
-      <article
-        aria-labelledby="featured-title"
-        className="grid overflow-hidden rounded-xl bg-blaze-surface lg:grid-cols-[2fr_3fr]"
-      >
-        <Link
-          to={`/article/${featured.slug ?? featured.id}`}
-          aria-label={featured.title}
-          className="block"
-        >
-          <div
-            aria-hidden="true"
-            className="aspect-[16/10] w-full bg-blaze-surface-2 lg:aspect-auto lg:h-full"
-          />
-        </Link>
-
-        <div className="flex flex-col justify-center gap-5 p-8 lg:p-12">
-          <time
-            dateTime={featured.date}
-            className="text-xs font-bold uppercase tracking-wider text-blaze-red"
-          >
-            {featured.dateLabel}
-          </time>
-          <h2
-            id="featured-title"
-            className="text-3xl font-bold leading-[1.15] text-white lg:text-4xl"
-          >
-            <Link
-              to={`/article/${featured.slug ?? featured.id}`}
-              className="hover:text-white/90"
-            >
-              {featured.title}
-            </Link>
-          </h2>
-          <p className="text-sm leading-relaxed text-blaze-muted">
-            {featured.description}
-          </p>
-        </div>
-      </article>
+      <FeaturedBanner featured={banner} />
 
       {/* Filtros */}
       <nav
@@ -160,15 +113,38 @@ function Blog() {
             role="tablist"
             className="flex items-stretch gap-2 text-[11px] font-bold uppercase overflow-y-visible overflow-x-auto"
           >
-            {categories.map((c) => {
-              const isActive = active === c.id;
+            <li role="presentation">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={active === ALL}
+                onClick={() => setActive(ALL)}
+                className={cn(
+                  "relative flex h-10 items-center whitespace-nowrap rounded-md bg-blaze-surface-2 px-4 transition-colors",
+                  active === ALL
+                    ? "text-white"
+                    : "text-blaze-muted hover:text-white",
+                )}
+              >
+                All Articles
+                {active === ALL && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-3 -bottom-[18px] h-0.5 bg-blaze-red"
+                  />
+                )}
+              </button>
+            </li>
+
+            {tags.map((tag) => {
+              const isActive = active === tag;
               return (
-                <li key={c.id} role="presentation">
+                <li key={tag} role="presentation">
                   <button
                     type="button"
                     role="tab"
                     aria-selected={isActive}
-                    onClick={() => setActive(c.id)}
+                    onClick={() => setActive(tag)}
                     className={cn(
                       "relative flex h-10 items-center whitespace-nowrap rounded-md bg-blaze-surface-2 px-4 transition-colors",
                       isActive
@@ -176,10 +152,7 @@ function Blog() {
                         : "text-blaze-muted hover:text-white",
                     )}
                   >
-                    {c.label}
-                    {c.count !== undefined && (
-                      <span className="ml-1 opacity-70">({c.count})</span>
-                    )}
+                    {tag}
                     {isActive && (
                       <span
                         aria-hidden="true"
@@ -214,47 +187,59 @@ function Blog() {
           </p>
         )}
 
-        {visible.map((a) => (
-          <article key={a.id} className="flex flex-col gap-3">
-            <Link
-              to={`/article/${a.slug ?? a.id}`}
-              className="block overflow-hidden rounded-lg"
-            >
-              <div
-                aria-hidden="true"
-                className="aspect-[16/10] w-full bg-blaze-surface-2"
-              />
-            </Link>
-            <time
-              dateTime={a.date}
-              className="text-xs font-bold uppercase tracking-wider text-blaze-red"
-            >
-              {a.dateLabel}
-            </time>
-            <h3 className="text-lg font-bold leading-tight text-white">
-              <Link
-                to={`/article/${a.slug ?? a.id}`}
-                className="hover:text-white/90"
-              >
-                {a.title}
+        {visible.map((a) => {
+          const aData = a.data as BlogPostData | undefined;
+          const aTitle = aData?.banner_principal_texto?.text ?? "";
+          const aImage = aData?.banner_principal_img;
+          const aDate = aData?.banner_principal_data ?? "";
+          const aSlug = a.uid;
+          const aTags = a.tags ?? [];
+          const aHref = `/article/${aSlug}`;
+
+          return (
+            <article key={a.id} className="flex flex-col gap-3">
+              <Link to={aHref} className="block overflow-hidden rounded-lg">
+                {aImage ? (
+                  <img
+                    src={aImage}
+                    alt=""
+                    className="aspect-[16/10] w-full object-cover"
+                  />
+                ) : (
+                  <div
+                    aria-hidden="true"
+                    className="aspect-[16/10] w-full bg-blaze-surface-2"
+                  />
+                )}
               </Link>
-            </h3>
-            {a.tags && a.tags.length > 0 && (
-              <ul
-                aria-label="Tags"
-                className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-blaze-red"
+              <time
+                dateTime={aDate}
+                className="text-xs font-bold uppercase tracking-wider text-blaze-red"
               >
-                {a.tags.map((tag) => (
-                  <li key={tag}>
-                    <a href={`#tag-${tag}`} className="hover:underline">
-                      #{tag}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </article>
-        ))}
+                {aDate}
+              </time>
+              <h3 className="text-lg font-bold leading-tight text-white">
+                <Link to={aHref} className="hover:text-white/90">
+                  {aTitle}
+                </Link>
+              </h3>
+              {aTags.length > 0 && (
+                <ul
+                  aria-label="Tags"
+                  className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-blaze-red"
+                >
+                  {aTags.map((tag) => (
+                    <li key={tag}>
+                      <a href={`#tag-${tag}`} className="hover:underline">
+                        #{tag}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </article>
+          );
+        })}
       </section>
     </div>
   );
