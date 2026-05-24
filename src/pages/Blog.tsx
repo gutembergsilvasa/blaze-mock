@@ -58,15 +58,12 @@ function FeaturedBanner({ featured }: { featured: FeaturedArticle }) {
 const ALL = "all" as const;
 
 function Blog() {
-  const { data, articles } = useBlog();
   const [active, setActive] = useState<string>(ALL);
+  const { data, articles } = useBlog(active === ALL ? undefined : active);
 
   const postData = data?.data as BlogPostData | undefined;
 
-  console.log({ articles });
-
-  const visible =
-    active === ALL ? articles : articles.filter((a) => a.tags.includes(active));
+  const visible = articles;
 
   const banner_principal_data = postData?.banner_principal_data ?? "";
   const banner_principal_img = postData?.banner_principal_img ?? "";
@@ -130,7 +127,7 @@ function Blog() {
                 {active === ALL && (
                   <span
                     aria-hidden="true"
-                    className="absolute inset-x-3 -bottom-[18px] h-0.5 bg-blaze-red"
+                    className="absolute inset-x-3 bottom-4.5 h-0.5 bg-blaze-red"
                   />
                 )}
               </button>
@@ -218,7 +215,7 @@ function Blog() {
               >
                 {aDate}
               </time>
-              <h3 className="text-lg font-bold leading-tight text-white">
+              <h3 className="text-lg font-bold leading-tight text-white min-h-[67px]">
                 <Link to={aHref} className="hover:text-white/90">
                   {aTitle}
                 </Link>

@@ -6,7 +6,7 @@ import type {
 
 const CMS_API_TOKEN =
   import.meta.env.VITE_CMS_API_TOKEN ??
-  "cms_a7ef14110b75651524deb928fe1440a61deaf446a161b44d7915b4bf93a4a639";
+  "cms_975d51443839df6db6ac1f1f627f2ae6382173007c3e585f7e37f37bc680ebe9";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "/api",
@@ -119,9 +119,21 @@ export async function getCmsCollectionByTag(
   type: string,
   tag: string,
   config?: AxiosRequestConfig,
-): Promise<DeliveryAPIPayload> {
-  return get<DeliveryAPIPayload>(
+): Promise<DeliveryAPIPayload[]> {
+  return get<DeliveryAPIPayload[]>(
     `/delivery/${type}/tag/${tag}?images=original`,
+    config,
+  );
+}
+
+export async function getCmsCollectionByTagAndSlug(
+  type: string,
+  tag: string,
+  slug: string,
+  config?: AxiosRequestConfig,
+): Promise<DeliveryAPIPayload[]> {
+  return get<DeliveryAPIPayload[]>(
+    `/delivery/${type}/tag/${tag}/${slug}?images=original`,
     config,
   );
 }

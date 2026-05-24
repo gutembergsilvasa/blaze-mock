@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getCmsCollectionBySlug,
+  getCmsCollectionByTag,
   getCmsCollectionByType,
 } from "../services/api";
 import type { DeliveryAPIPayload, SemanticText } from "../utils/types";
@@ -33,46 +34,56 @@ export type UseBlogResult = {
   articles: DeliveryAPIPayload[];
   isLoading: boolean;
   error: Error | null;
-  refetch: () => void;
 };
 
 const BLOG_ENDPOINT = "blog";
 const ARTICLES_ENDPOINT = "blog-artigos";
 export const SECAO_INCIAL = "secao-principal";
 
-export function useBlog(): UseBlogResult {
+export function useBlog(activeTag?: string): UseBlogResult {
   const [data, setData] = useState<DeliveryAPIPayload | null>(null);
   const [articles, setArticles] = useState<DeliveryAPIPayload[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchBlog = useCallback(async (signal?: AbortSignal) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const [bannerResult, articlesResult] = await Promise.all([
-        getCmsCollectionBySlug(BLOG_ENDPOINT, SECAO_INCIAL, { signal }),
-        getCmsCollectionByType(ARTICLES_ENDPOINT, { signal }),
-      ]);
-      setData(bannerResult);
-      setArticles(articlesResult.results);
-    } catch (err) {
-      if (err instanceof Error && err.name === "CanceledError") return;
-      setError(err instanceof Error ? err : new Error(String(err)));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
+  // Banner — fetched once
   useEffect(() => {
     const controller = new AbortController();
-    fetchBlog(controller.signal);
+    getCmsCollectionBySlug(BLOG_ENDPOINT, SECAO_INCIAL, {
+      signal: controller.signal,
+    })
+      .then(setData)
+      .catch((err: unknown) => {
+        if (err instanceof Error && err.name === "CanceledError") return;
+        setError(err instanceof Error ? err : new Error(String(err)));
+      });
     return () => controller.abort();
-  }, [fetchBlog]);
+  }, []);
 
-  const refetch = useCallback(() => {
-    fetchBlog();
-  }, [fetchBlog]);
+  // Articles — re-fetched whenever the active tag changes
+  useEffect(() => {
+    const controller = new AbortController();
+    setIsLoading(true);
+    setError(null);
 
-  return { data, articles, isLoading, error, refetch };
+    const promise: Promise<DeliveryAPIPayload[]> = activeTag
+      ? getCmsCollectionByTag(ARTICLES_ENDPOINT, activeTag, {
+          signal: controller.signal,
+        })
+      : getCmsCollectionByType(ARTICLES_ENDPOINT, {
+          signal: controller.signal,
+        }).then((r) => r.results);
+
+    promise
+      .then(setArticles)
+      .catch((err: unknown) => {
+        if (err instanceof Error && err.name === "CanceledError") return;
+        setError(err instanceof Error ? err : new Error(String(err)));
+      })
+      .finally(() => setIsLoading(false));
+
+    return () => controller.abort();
+  }, [activeTag]);
+
+  return { data, articles, isLoading, error };
 }
