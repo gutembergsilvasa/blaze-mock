@@ -6,7 +6,7 @@ import type {
 
 const CMS_API_TOKEN =
   import.meta.env.VITE_CMS_API_TOKEN ??
-  "cms_975d51443839df6db6ac1f1f627f2ae6382173007c3e585f7e37f37bc680ebe9";
+  "cms_a7ef14110b75651524deb928fe1440a61deaf446a161b44d7915b4bf93a4a639";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "/api",
