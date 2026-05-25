@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useState } from "react";
 import { getCmsCollectionBySlug } from "../services/api";
-import type { SemanticText } from "../utils/types";
+import type { SemanticText, SeoMetadata } from "../utils/types";
 
 export type ContentBlock =
   | { type: "paragraph"; html: string }
@@ -22,6 +22,7 @@ const ARTICLE_ENDPOINT = "artigos";
 
 export function useArticle(slug: string | undefined) {
   const [data, setData] = useState<ArticleData | null>(null);
+  const [seo, setSeo] = useState<SeoMetadata | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(Boolean(slug));
   const [error, setError] = useState<Error | null>(null);
 
@@ -35,11 +36,9 @@ export function useArticle(slug: string | undefined) {
           currentSlug,
           { signal },
         );
-        console.log({ result });
         setData(result.data as ArticleData);
+        setSeo(result.seo as SeoMetadata | undefined);
       } catch (err) {
-        console.log({ err });
-
         if (err instanceof Error && err.name === "CanceledError") return;
         setError(err instanceof Error ? err : new Error(String(err)));
       } finally {
@@ -49,11 +48,10 @@ export function useArticle(slug: string | undefined) {
     [],
   );
 
-  console.log({ slug });
-
   useEffect(() => {
     if (!slug) {
       setData(null);
+      setSeo(undefined);
       setIsLoading(false);
       return;
     }
@@ -67,5 +65,5 @@ export function useArticle(slug: string | undefined) {
     if (slug) fetchArticle(slug);
   }, [slug, fetchArticle]);
 
-  return { data, isLoading, error, refetch };
+  return { data, seo, isLoading, error, refetch };
 }

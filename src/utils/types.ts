@@ -24,3 +24,13 @@ export type SemanticText = {
   text: string;
   semanticTag?: string;
 };
+
+export interface SeoMetadata {
+  metaTitle?: string;
+  metaDescription?: string;
+  canonicalUrl?: string;
+  focusKeyphrase?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+}

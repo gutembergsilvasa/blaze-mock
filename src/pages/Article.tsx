@@ -5,6 +5,7 @@ import Link from "@tiptap/extension-link";
 import { TextStyleKit } from "@tiptap/extension-text-style";
 
 import { useArticle } from "../hooks/useArticle";
+import { Seo } from "../components/Seo";
 
 import { Editor } from "@tiptap/core";
 import { Markdown } from "@tiptap/markdown";
@@ -38,7 +39,7 @@ const fallback = {
 
 function Article() {
   const { slug } = useParams<{ slug: string }>();
-  const { data } = useArticle(slug);
+  const { data, seo } = useArticle(slug);
 
   const title = data?.article_title.text ?? fallback.title;
   const date = data?.article_date ?? fallback.date;
@@ -46,10 +47,15 @@ function Article() {
   const shareUrls = fallback.shareUrls;
   const content = data?.article_main_content;
 
-  console.log({ content, data });
-
   return (
     <article className="mx-auto max-w-3xl px-4 py-8">
+      <Seo
+        seo={seo}
+        fallbackTitle={data?.article_title.text}
+        fallbackImage={data?.article_banner}
+        url={typeof window !== "undefined" ? window.location.href : undefined}
+      />
+
       <header className="text-center">
         <h1 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">
           {title}

@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "../lib/cn";
+import { Seo } from "../components/Seo";
 import {
   SECAO_INCIAL,
   useBlog,
   type BlogPostData,
   type FeaturedArticle,
 } from "../hooks/useBlog";
+import type { SeoMetadata } from "../utils/types";
 
 function FeaturedBanner({ featured }: { featured: FeaturedArticle }) {
   const href = `/article/${featured.slug ?? featured.id}`;
@@ -62,6 +64,7 @@ function Blog() {
   const { data, articles } = useBlog(active === ALL ? undefined : active);
 
   const postData = data?.data as BlogPostData | undefined;
+  const seo = data?.seo as SeoMetadata | undefined;
 
   const visible = articles;
 
@@ -85,6 +88,13 @@ function Blog() {
 
   return (
     <div className="space-y-10 pt-4 pb-12">
+      <Seo
+        seo={seo}
+        fallbackTitle="Blog - Blaze"
+        fallbackDescription={banner_principal_descricao?.text}
+        fallbackImage={banner_principal_img}
+      />
+
       <header>
         <h1 className="text-3xl font-bold text-white">Blog</h1>
       </header>

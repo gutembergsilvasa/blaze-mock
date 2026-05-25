@@ -1,8 +1,9 @@
 import { Button } from '../components/ui/Button'
+import { Seo } from '../components/Seo'
 import { useHome } from '../hooks/useHome'
 
 function Home() {
-  const { data } = useHome()
+  const { data, seo } = useHome()
 
   const hero = data?.hero
   const heroTitle = hero?.title ?? 'Bem-vindo à Blaze!'
@@ -12,6 +13,12 @@ function Home() {
 
   return (
     <>
+      <Seo
+        seo={seo}
+        fallbackTitle="Blaze - Cassino e Apostas Esportivas"
+        fallbackDescription="Cadastre-se e desbloqueie sua experiência exclusiva"
+      />
+
       {/* Hero banner */}
       <section
         aria-labelledby="hero-title"

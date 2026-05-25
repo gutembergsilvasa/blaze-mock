@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useState } from "react";
 import { getCmsCollectionBySlug } from "../services/api";
-import type { DeliveryAPIPayload } from "../utils/types";
+import type { DeliveryAPIPayload, SeoMetadata } from "../utils/types";
 
 export type HeroStep = {
   id: string;
@@ -50,6 +50,7 @@ export type HomeData = {
 
 export type UseHomeResult = {
   data: HomeData | null;
+  seo: SeoMetadata | undefined;
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
@@ -100,6 +101,7 @@ function adaptToHomeData(
 
 export function useHome(): UseHomeResult {
   const [data, setData] = useState<HomeData | null>(null);
+  const [seo, setSeo] = useState<SeoMetadata | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -111,6 +113,7 @@ export function useHome(): UseHomeResult {
         signal,
       });
       setData(adaptToHomeData(result));
+      setSeo(result.seo as SeoMetadata | undefined);
     } catch (err) {
       if (err instanceof Error && err.name === "CanceledError") return;
       setError(err instanceof Error ? err : new Error(String(err)));
@@ -129,5 +132,5 @@ export function useHome(): UseHomeResult {
     fetchHome();
   }, [fetchHome]);
 
-  return { data, isLoading, error, refetch };
+  return { data, seo, isLoading, error, refetch };
 }
