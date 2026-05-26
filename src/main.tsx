@@ -4,13 +4,16 @@ import { RouterProvider } from 'react-router-dom'
 import { createHead, UnheadProvider } from '@unhead/react/client'
 import './index.css'
 import { router } from './routes'
+import { LanguageProvider } from './context/LanguageContext'
 
 const head = createHead()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <UnheadProvider head={head}>
-      <RouterProvider router={router} />
-    </UnheadProvider>
+    <LanguageProvider>
+      <UnheadProvider head={head}>
+        <RouterProvider router={router} />
+      </UnheadProvider>
+    </LanguageProvider>
   </StrictMode>,
 )

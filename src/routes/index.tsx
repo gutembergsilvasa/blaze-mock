@@ -13,6 +13,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Blog /> },
       { path: "blog", element: <Blog /> },
       { path: "article/:slug", element: <Article /> },
+      { path: "article/:lang/:slug", element: <Article /> },
     ],
   },
 ]);

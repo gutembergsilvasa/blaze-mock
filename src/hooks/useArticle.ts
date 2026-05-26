@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useState } from "react";
 import { getCmsCollectionBySlug } from "../services/api";
+import { useLanguage } from "../context/LanguageContext";
 import type { SemanticText, SeoMetadata } from "../utils/types";
 
 export type ContentBlock =
@@ -21,19 +22,25 @@ export interface ArticleData {
 const ARTICLE_ENDPOINT = "artigos";
 
 export function useArticle(slug: string | undefined) {
+  const { lang } = useLanguage();
   const [data, setData] = useState<ArticleData | null>(null);
   const [seo, setSeo] = useState<SeoMetadata | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(Boolean(slug));
   const [error, setError] = useState<Error | null>(null);
 
   const fetchArticle = useCallback(
-    async (currentSlug: string, signal?: AbortSignal) => {
+    async (
+      currentSlug: string,
+      currentLang: string,
+      signal?: AbortSignal,
+    ) => {
       setIsLoading(true);
       setError(null);
       try {
         const result = await getCmsCollectionBySlug(
           ARTICLE_ENDPOINT,
           currentSlug,
+          currentLang,
           { signal },
         );
         setData(result.data as ArticleData);
@@ -57,13 +64,13 @@ export function useArticle(slug: string | undefined) {
     }
 
     const controller = new AbortController();
-    fetchArticle(slug, controller.signal);
+    fetchArticle(slug, lang, controller.signal);
     return () => controller.abort();
-  }, [slug, fetchArticle]);
+  }, [slug, lang, fetchArticle]);
 
   const refetch = useCallback(() => {
-    if (slug) fetchArticle(slug);
-  }, [slug, fetchArticle]);
+    if (slug) fetchArticle(slug, lang);
+  }, [slug, lang, fetchArticle]);
 
   return { data, seo, isLoading, error, refetch };
 }

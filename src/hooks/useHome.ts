@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useState } from "react";
 import { getCmsCollectionBySlug } from "../services/api";
+import { useLanguage } from "../context/LanguageContext";
 import type { DeliveryAPIPayload, SeoMetadata } from "../utils/types";
 
 export type HeroStep = {
@@ -100,37 +101,44 @@ function adaptToHomeData(
 }
 
 export function useHome(): UseHomeResult {
+  const { lang } = useLanguage();
   const [data, setData] = useState<HomeData | null>(null);
   const [seo, setSeo] = useState<SeoMetadata | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchHome = useCallback(async (signal?: AbortSignal) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await getCmsCollectionBySlug(HOME_ENDPOINT, HOME_SLUG, {
-        signal,
-      });
-      setData(adaptToHomeData(result));
-      setSeo(result.seo as SeoMetadata | undefined);
-    } catch (err) {
-      if (err instanceof Error && err.name === "CanceledError") return;
-      setError(err instanceof Error ? err : new Error(String(err)));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const fetchHome = useCallback(
+    async (currentLang: string, signal?: AbortSignal) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await getCmsCollectionBySlug(
+          HOME_ENDPOINT,
+          HOME_SLUG,
+          currentLang,
+          { signal },
+        );
+        setData(adaptToHomeData(result));
+        setSeo(result.seo as SeoMetadata | undefined);
+      } catch (err) {
+        if (err instanceof Error && err.name === "CanceledError") return;
+        setError(err instanceof Error ? err : new Error(String(err)));
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchHome(controller.signal);
+    fetchHome(lang, controller.signal);
     return () => controller.abort();
-  }, [fetchHome]);
+  }, [lang, fetchHome]);
 
   const refetch = useCallback(() => {
-    fetchHome();
-  }, [fetchHome]);
+    fetchHome(lang);
+  }, [lang, fetchHome]);
 
   return { data, seo, isLoading, error, refetch };
 }

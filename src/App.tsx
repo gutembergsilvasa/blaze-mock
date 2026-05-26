@@ -1,12 +1,19 @@
 import { Link, Outlet } from "react-router-dom";
-import { Button } from "./components/ui/Button";
+import { cn } from "./lib/cn";
+import {
+  LANGUAGES,
+  LANGUAGE_LABELS,
+  useLanguage,
+} from "./context/LanguageContext";
 
 function App() {
+  const { lang, setLang } = useLanguage();
+
   return (
     <div className="min-h-screen bg-blaze-bg text-white">
       {/* Top navigation */}
       <header className="border-b border-blaze-border/60">
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between gap-6 px-6 py-4">
           <div className="flex items-center gap-8">
             <button
               type="button"
@@ -24,70 +31,47 @@ function App() {
             </Link>
           </div>
 
-          <nav aria-label="Principal" className="flex-1">
-            <ul className="flex items-center justify-end gap-8 text-sm font-medium tracking-wide text-white/90">
-              <li>
-                <a
-                  href="#cassino"
-                  className="flex items-center gap-2 hover:text-white"
-                >
-                  <i
-                    className="fa-solid fa-clone text-base"
-                    aria-hidden="true"
-                  />
-                  CASSINO
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#esportes"
-                  className="flex items-center gap-2 hover:text-white"
-                >
-                  <i
-                    className="fa-solid fa-futbol text-base"
-                    aria-hidden="true"
-                  />
-                  ESPORTES
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#pesquisa"
-                  className="flex items-center gap-2 hover:text-white"
-                >
-                  <i
-                    className="fa-solid fa-magnifying-glass text-base"
-                    aria-hidden="true"
-                  />
-                  PESQUISA
-                </a>
-              </li>
-              <li>
-                <Link
-                  to="/blog"
-                  className="flex items-center gap-2 hover:text-white"
-                >
-                  <i
-                    className="fa-solid fa-newspaper text-base"
-                    aria-hidden="true"
-                  />
-                  BLOG
-                </Link>
-              </li>
-            </ul>
-          </nav>
-
-          <div className="ml-8 flex items-center gap-4">
-            <a
-              href="#entrar"
-              className="text-sm font-medium text-white/90 hover:text-white"
+          <nav
+            aria-label="Principal"
+            className="flex flex-1 items-center justify-end gap-6"
+          >
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-sm font-medium tracking-wide text-white/90 hover:text-white"
             >
-              Entrar
-            </a>
-            <Button href="#cadastre-se" size="sm">
-              Cadastre-se
-            </Button>
-          </div>
+              <i
+                className="fa-solid fa-newspaper text-base"
+                aria-hidden="true"
+              />
+              BLOG
+            </Link>
+
+            <div
+              role="group"
+              aria-label="Idioma"
+              className="flex items-center gap-1 rounded-md bg-blaze-surface-2 p-1"
+            >
+              {LANGUAGES.map((option) => {
+                const isActive = lang === option;
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => setLang(option)}
+                    className={cn(
+                      "rounded px-3 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors",
+                      isActive
+                        ? "bg-blaze-red text-white"
+                        : "text-white/70 hover:text-white",
+                    )}
+                  >
+                    {LANGUAGE_LABELS[option]}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
         </div>
       </header>
 

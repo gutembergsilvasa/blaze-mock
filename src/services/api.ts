@@ -96,10 +96,11 @@ export async function del<T>(
 
 export async function getCmsCollectionByType(
   type: string,
+  lang: string = "en-US",
   config?: AxiosRequestConfig,
 ): Promise<DeliveryByTypeAPIPayload> {
   return get<DeliveryByTypeAPIPayload>(
-    `/delivery/${type}?images=original`,
+    `/delivery/${type}?images=original&lang=${lang}`,
     config,
   );
 }
@@ -107,10 +108,11 @@ export async function getCmsCollectionByType(
 export async function getCmsCollectionBySlug(
   type: string,
   slug: string,
+  lang: string = "en-US",
   config?: AxiosRequestConfig,
 ): Promise<DeliveryAPIPayload> {
   return get<DeliveryAPIPayload>(
-    `/delivery/${type}/${slug}?images=original`,
+    `/delivery/${type}/${slug}?images=original&lang=${lang}`,
     config,
   );
 }
@@ -118,10 +120,11 @@ export async function getCmsCollectionBySlug(
 export async function getCmsCollectionByTag(
   type: string,
   tag: string,
+  lang: string = "en-US",
   config?: AxiosRequestConfig,
 ): Promise<DeliveryAPIPayload[]> {
   return get<DeliveryAPIPayload[]>(
-    `/delivery/${type}/tag/${tag}?images=original`,
+    `/delivery/${type}/tag/${tag}?images=original&lang=${lang}`,
     config,
   );
 }
@@ -130,10 +133,11 @@ export async function getCmsCollectionByTagAndSlug(
   type: string,
   tag: string,
   slug: string,
+  lang: string = "en-US",
   config?: AxiosRequestConfig,
 ): Promise<DeliveryAPIPayload[]> {
   return get<DeliveryAPIPayload[]>(
-    `/delivery/${type}/tag/${tag}/${slug}?images=original`,
+    `/delivery/${type}/tag/${tag}/${slug}?images=original&lang=${lang}`,
     config,
   );
 }

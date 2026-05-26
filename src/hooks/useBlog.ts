@@ -5,6 +5,7 @@ import {
   getCmsCollectionByTag,
   getCmsCollectionByType,
 } from "../services/api";
+import { useLanguage } from "../context/LanguageContext";
 import type { DeliveryAPIPayload, SemanticText } from "../utils/types";
 
 export type BlogPostData = {
@@ -41,15 +42,16 @@ const ARTICLES_ENDPOINT = "blog-artigos";
 export const SECAO_INCIAL = "secao-principal";
 
 export function useBlog(activeTag?: string): UseBlogResult {
+  const { lang } = useLanguage();
   const [data, setData] = useState<DeliveryAPIPayload | null>(null);
   const [articles, setArticles] = useState<DeliveryAPIPayload[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Banner — fetched once
+  // Banner — re-fetched whenever the language changes
   useEffect(() => {
     const controller = new AbortController();
-    getCmsCollectionBySlug(BLOG_ENDPOINT, SECAO_INCIAL, {
+    getCmsCollectionBySlug(BLOG_ENDPOINT, SECAO_INCIAL, lang, {
       signal: controller.signal,
     })
       .then(setData)
@@ -58,19 +60,19 @@ export function useBlog(activeTag?: string): UseBlogResult {
         setError(err instanceof Error ? err : new Error(String(err)));
       });
     return () => controller.abort();
-  }, []);
+  }, [lang]);
 
-  // Articles — re-fetched whenever the active tag changes
+  // Articles — re-fetched whenever the active tag or language changes
   useEffect(() => {
     const controller = new AbortController();
     setIsLoading(true);
     setError(null);
 
     const promise: Promise<DeliveryAPIPayload[]> = activeTag
-      ? getCmsCollectionByTag(ARTICLES_ENDPOINT, activeTag, {
+      ? getCmsCollectionByTag(ARTICLES_ENDPOINT, activeTag, lang, {
           signal: controller.signal,
         })
-      : getCmsCollectionByType(ARTICLES_ENDPOINT, {
+      : getCmsCollectionByType(ARTICLES_ENDPOINT, lang, {
           signal: controller.signal,
         }).then((r) => r.results);
 
@@ -83,7 +85,7 @@ export function useBlog(activeTag?: string): UseBlogResult {
       .finally(() => setIsLoading(false));
 
     return () => controller.abort();
-  }, [activeTag]);
+  }, [activeTag, lang]);
 
   return { data, articles, isLoading, error };
 }
