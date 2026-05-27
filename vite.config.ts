@@ -9,9 +9,9 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: "https://api.cmsignite.com",
-        // target: "https://localhost:3000",
+        // target: "http://localhost:3000",
         changeOrigin: true,
-        secure: true,
+        secure: false,
       },
     },
   },
