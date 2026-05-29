@@ -2,7 +2,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { getCmsCollectionBySlug } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
-import type { SemanticText, SeoMetadata } from "../utils/types";
+import type {
+  SemanticText,
+  SeoMetadata,
+  TableData,
+} from "../utils/types";
 
 export type ContentBlock =
   | { type: "paragraph"; html: string }
@@ -17,6 +21,7 @@ export interface ArticleData {
   article_date: string; // Formato de data (geralmente 'YYYY-MM-DD' ou ISO string)
   article_banner: string;
   article_main_content: RichTextBlock;
+  table?: TableData;
 }
 
 const ARTICLE_ENDPOINT = "artigos";

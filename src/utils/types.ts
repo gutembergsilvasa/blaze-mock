@@ -34,3 +34,8 @@ export interface SeoMetadata {
   ogDescription?: string;
   ogImage?: string;
 }
+
+export interface TableData {
+  columns: string[];
+  rows: string[][];
+}

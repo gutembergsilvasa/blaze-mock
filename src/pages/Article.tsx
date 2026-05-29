@@ -6,6 +6,7 @@ import { TextStyleKit } from "@tiptap/extension-text-style";
 
 import { useArticle } from "../hooks/useArticle";
 import { Seo } from "../components/Seo";
+import { Table } from "../components/Table";
 
 import { Editor } from "@tiptap/core";
 import { Markdown } from "@tiptap/markdown";
@@ -46,6 +47,7 @@ function Article() {
   const banner = data?.article_banner;
   const shareUrls = fallback.shareUrls;
   const content = data?.article_main_content;
+  const table = data?.table;
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-8">
@@ -104,6 +106,12 @@ function Article() {
       {content ? (
         <div className="mx-auto mt-8 max-w-2xl">
           <RenderTiptapContent content={content as Content} />
+        </div>
+      ) : null}
+
+      {table ? (
+        <div className="mx-auto mt-4 max-w-2xl">
+          <Table table={table} />
         </div>
       ) : null}
     </article>
