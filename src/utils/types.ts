@@ -26,13 +26,35 @@ export type SemanticText = {
 };
 
 export interface SeoMetadata {
+  // Meta
   metaTitle?: string;
   metaDescription?: string;
   canonicalUrl?: string;
   focusKeyphrase?: string;
+  // OpenGraph
+  ogType?: string;
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;
+  // Twitter Cards
+  twitterCard?:
+    | "summary"
+    | "summary_large_image"
+    | "app"
+    | "player"
+    | string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+  // Robots directives
+  noIndex?: boolean;
+  noFollow?: boolean;
+  noArchive?: boolean;
+  noSnippet?: boolean;
+  // Reservados pro follow-up (declarados pra não quebrar tipos)
+  schemaType?: string;
+  breadcrumbTitle?: string;
+  sitemapChangefreq?: string;
 }
 
 export interface TableData {
