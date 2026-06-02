@@ -119,25 +119,31 @@ export async function getCmsCollectionBySlug(
 
 export async function getCmsCollectionByTag(
   type: string,
-  tag: string,
+  tags: string[],
   lang: string = "en-US",
   config?: AxiosRequestConfig,
-): Promise<DeliveryAPIPayload[]> {
-  return get<DeliveryAPIPayload[]>(
-    `/delivery/${type}/tag/${tag}?images=original&lang=${lang}`,
+): Promise<DeliveryByTypeAPIPayload> {
+  const tagParams = tags
+    .map((tag) => `&tag=${encodeURIComponent(tag)}`)
+    .join("");
+  return get<DeliveryByTypeAPIPayload>(
+    `/delivery/${type}?images=original&lang=${lang}${tagParams}`,
     config,
   );
 }
 
 export async function getCmsCollectionByTagAndSlug(
   type: string,
-  tag: string,
   slug: string,
+  tags: string[],
   lang: string = "en-US",
   config?: AxiosRequestConfig,
 ): Promise<DeliveryAPIPayload[]> {
+  const tagParams = tags
+    .map((tag) => `&tag=${encodeURIComponent(tag)}`)
+    .join("");
   return get<DeliveryAPIPayload[]>(
-    `/delivery/${type}/tag/${tag}/${slug}?images=original&lang=${lang}`,
+    `/delivery/${type}/${slug}?images=original&lang=${lang}${tagParams}`,
     config,
   );
 }

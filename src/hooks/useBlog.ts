@@ -6,10 +6,14 @@ import {
   getCmsCollectionByType,
 } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
-import type { DeliveryAPIPayload, SemanticText } from "../utils/types";
+import type {
+  DeliveryAPIPayload,
+  MediaItem,
+  SemanticText,
+} from "../utils/types";
 
 export type BlogPostData = {
-  banner_principal_img?: string;
+  banner_principal_img?: MediaItem;
   banner_principal_data?: string;
   banner_principal_texto?: SemanticText;
   banner_principal_descricao?: SemanticText;
@@ -22,6 +26,8 @@ export type BlogArticle = {
   title: string;
   tags?: string[];
   image?: string;
+  image_mobile?: string;
+  image_alt?: string;
 };
 
 export type FeaturedArticle = BlogArticle & {
@@ -69,9 +75,9 @@ export function useBlog(activeTag?: string): UseBlogResult {
     setError(null);
 
     const promise: Promise<DeliveryAPIPayload[]> = activeTag
-      ? getCmsCollectionByTag(ARTICLES_ENDPOINT, activeTag, lang, {
+      ? getCmsCollectionByTag(ARTICLES_ENDPOINT, [activeTag], lang, {
           signal: controller.signal,
-        })
+        }).then((r) => r.results)
       : getCmsCollectionByType(ARTICLES_ENDPOINT, lang, {
           signal: controller.signal,
         }).then((r) => r.results);

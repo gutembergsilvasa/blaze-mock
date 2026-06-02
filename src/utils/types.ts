@@ -37,12 +37,7 @@ export interface SeoMetadata {
   ogDescription?: string;
   ogImage?: string;
   // Twitter Cards
-  twitterCard?:
-    | "summary"
-    | "summary_large_image"
-    | "app"
-    | "player"
-    | string;
+  twitterCard?: "summary" | "summary_large_image" | "app" | "player" | string;
   twitterTitle?: string;
   twitterDescription?: string;
   twitterImage?: string;
@@ -60,4 +55,27 @@ export interface SeoMetadata {
 export interface TableData {
   columns: string[];
   rows: string[][];
+}
+
+export interface MobileImage {
+  alt: string;
+  url: string;
+  size: number;
+  width: number | null;
+  height: number | null;
+  blurHash: string | null;
+  filename: string;
+  mimeType: string; // Você também pode usar uma união de strings literais se souber os tipos exatos, ex: 'image/jpeg' | 'image/webp'
+}
+
+export interface MediaItem {
+  alt: string;
+  url: string;
+  size: number;
+  width: number;
+  height: number;
+  mobile: MobileImage;
+  blurHash: string;
+  filename: string;
+  mimeType: string;
 }

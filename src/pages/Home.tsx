@@ -1,15 +1,15 @@
-import { Button } from '../components/ui/Button'
-import { Seo } from '../components/Seo'
-import { useHome } from '../hooks/useHome'
+import { Button } from "../components/ui/Button";
+import { Seo } from "../components/Seo";
+import { useHome } from "../hooks/useHome";
 
 function Home() {
-  const { data, seo } = useHome()
+  const { data, seo } = useHome();
 
-  const hero = data?.hero
-  const heroTitle = hero?.title ?? 'Bem-vindo à Blaze!'
+  const hero = data?.hero;
+  const heroTitle = hero?.title ?? "Bem-vindo à Blaze!";
   const heroSubtitle =
-    hero?.subtitle ?? 'Cadastre-se e desbloqueie sua experiência exclusiva'
-  const heroCta = hero?.cta ?? { label: 'Cadastre-se', href: '#cadastre-se' }
+    hero?.subtitle ?? "Cadastre-se e desbloqueie sua experiência exclusiva";
+  const heroCta = hero?.cta ?? { label: "Cadastre-se", href: "#cadastre-se" };
 
   return (
     <>
@@ -265,7 +265,9 @@ function Home() {
             Patrocínio
           </span>
           <div className="relative z-10 mt-32 max-w-xs">
-            <h3 className="text-xl font-bold text-white">Atlético Goianiense</h3>
+            <h3 className="text-xl font-bold text-white">
+              Atlético Goianiense
+            </h3>
             <p className="mt-1 text-sm text-blaze-muted">Patrocinador Máster</p>
             <Button
               to="/article/atletico"
@@ -279,7 +281,7 @@ function Home() {
         </article>
       </section>
     </>
-  )
+  );
 }
 
-export default Home
+export default Home;

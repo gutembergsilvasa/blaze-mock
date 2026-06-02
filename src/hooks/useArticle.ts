@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getCmsCollectionBySlug } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
 import type {
+  MediaItem,
   SemanticText,
   SeoMetadata,
   TableData,
@@ -19,7 +20,7 @@ export interface RichTextBlock {
 export interface ArticleData {
   article_title: SemanticText;
   article_date: string; // Formato de data (geralmente 'YYYY-MM-DD' ou ISO string)
-  article_banner: string;
+  article_banner: MediaItem;
   article_main_content: RichTextBlock;
   table?: TableData;
 }

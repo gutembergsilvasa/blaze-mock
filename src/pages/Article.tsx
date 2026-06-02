@@ -44,7 +44,9 @@ function Article() {
 
   const title = data?.article_title.text ?? fallback.title;
   const date = data?.article_date ?? fallback.date;
-  const banner = data?.article_banner;
+  const banner = data?.article_banner?.url;
+  const bannerMobile = data?.article_banner?.mobile?.url;
+  const bannerAlt = data?.article_banner?.alt ?? "";
   const shareUrls = fallback.shareUrls;
   const content = data?.article_main_content;
   const table = data?.table;
@@ -54,7 +56,7 @@ function Article() {
       <Seo
         seo={seo}
         fallbackTitle={data?.article_title.text}
-        fallbackImage={data?.article_banner}
+        fallbackImage={banner}
         url={typeof window !== "undefined" ? window.location.href : undefined}
       />
 
@@ -95,13 +97,20 @@ function Article() {
         </div>
       </header>
 
-      <figure className="mt-8">
-        <img
-          src={banner}
-          aria-hidden="true"
-          className="aspect-[16/9] w-full overflow-hidden rounded-lg bg-blaze-surface-2"
-        />
-      </figure>
+      {banner ? (
+        <figure className="mt-8">
+          <picture>
+            {bannerMobile && (
+              <source media="(max-width: 768px)" srcSet={bannerMobile} />
+            )}
+            <img
+              src={banner}
+              alt={bannerAlt}
+              className="aspect-[16/9] w-full overflow-hidden rounded-lg bg-blaze-surface-2"
+            />
+          </picture>
+        </figure>
+      ) : null}
 
       {content ? (
         <div className="mx-auto mt-8 max-w-2xl">

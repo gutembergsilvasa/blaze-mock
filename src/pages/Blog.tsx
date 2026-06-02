@@ -21,11 +21,19 @@ function FeaturedBanner({ featured }: { featured: FeaturedArticle }) {
     >
       <Link to={href} aria-label={featured.title} className="block">
         {featured.image ? (
-          <img
-            src={featured.image}
-            alt=""
-            className="aspect-[16/10] w-full object-cover lg:aspect-auto lg:h-full"
-          />
+          <picture>
+            {featured.image_mobile && (
+              <source
+                media="(max-width: 768px)"
+                srcSet={featured.image_mobile}
+              />
+            )}
+            <img
+              src={featured.image}
+              alt={featured.image_alt ?? ""}
+              className="aspect-[16/10] w-full object-cover lg:aspect-auto lg:h-full"
+            />
+          </picture>
         ) : (
           <div
             aria-hidden="true"
@@ -65,11 +73,14 @@ function Blog() {
 
   const postData = data?.data as BlogPostData | undefined;
   const seo = data?.seo as SeoMetadata | undefined;
-
+  console.log({ articles });
   const visible = articles;
 
   const banner_principal_data = postData?.banner_principal_data ?? "";
-  const banner_principal_img = postData?.banner_principal_img ?? "";
+  const banner_principal_img = postData?.banner_principal_img?.url ?? "";
+  const banner_principal_img_mobile =
+    postData?.banner_principal_img?.mobile?.url ?? "";
+  const banner_principal_img_alt = postData?.banner_principal_img?.alt ?? "";
   const banner_principal_descricao = postData?.banner_principal_descricao;
   const banner_principal_texto = postData?.banner_principal_texto;
   const tags = data?.tags ?? [];
@@ -81,6 +92,8 @@ function Blog() {
     title: banner_principal_texto?.text || "",
     tags,
     image: banner_principal_img,
+    image_mobile: banner_principal_img_mobile,
+    image_alt: banner_principal_img_alt,
     description: banner_principal_descricao?.text || "",
     titleTag: banner_principal_texto?.semanticTag,
     descriptionTag: banner_principal_descricao?.semanticTag,
@@ -197,7 +210,9 @@ function Blog() {
         {visible.map((a) => {
           const aData = a.data as BlogPostData | undefined;
           const aTitle = aData?.banner_principal_texto?.text ?? "";
-          const aImage = aData?.banner_principal_img;
+          const aImage = aData?.banner_principal_img?.url;
+          const aImageMobile = aData?.banner_principal_img?.mobile?.url ?? "";
+          const aImageAlt = aData?.banner_principal_img?.alt ?? "";
           const aDate = aData?.banner_principal_data ?? "";
           const aSlug = a.uid;
           const aTags = a.tags ?? [];
@@ -207,11 +222,19 @@ function Blog() {
             <article key={a.id} className="flex flex-col gap-3">
               <Link to={aHref} className="block overflow-hidden rounded-lg">
                 {aImage ? (
-                  <img
-                    src={aImage}
-                    alt=""
-                    className="aspect-[16/10] w-full object-cover"
-                  />
+                  <picture>
+                    {aImageMobile && (
+                      <source
+                        media="(max-width: 768px)"
+                        srcSet={aImageMobile}
+                      />
+                    )}
+                    <img
+                      src={aImage}
+                      alt={aImageAlt}
+                      className="aspect-[16/10] w-full object-cover"
+                    />
+                  </picture>
                 ) : (
                   <div
                     aria-hidden="true"
