@@ -6,11 +6,32 @@ export interface DeliveryAPIPayload {
   first_publication_date: string; // ISO Date String
   last_publication_date: string; // ISO Date String
   alternate_languages: string[]; // Defina um tipo específico se houver dados aqui futuramente
-  data: unknown;
+  data: { slices?: Slice[] } & Record<string, unknown>;
   sections: unknown; // Tipificado como null baseado no payload, mas flexível
   seo: Record<string, unknown>; // Objeto vazio no payload, geralmente mapeia metadados
   tags: string[];
 }
+
+export interface CtaSlicePrimary {
+  "link-cta": string;
+  "cor-cta": string;
+  "texto-cta": SemanticText;
+}
+
+export interface TiptapDoc {
+  type: "doc";
+  content: unknown[];
+}
+
+export interface Slice {
+  id: string;
+  items: unknown[]; // Substitua 'unknown' caso os items venham a ter uma estrutura específica no futuro
+  primary: Record<string, unknown>; // Chaves variam por slice_type (ex.: cta, artigo-blaze)
+  variation: string; // Permite 'default' ou novas variações de estilo do Prismic/CMS
+  slice_type: string; // Ex.: 'cta', 'artigo-blaze', extensível
+}
+
+export type CtaSlice = Slice & { primary: CtaSlicePrimary };
 
 export interface DeliveryByTypeAPIPayload {
   page: number;

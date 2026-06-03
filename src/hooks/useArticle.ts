@@ -6,6 +6,7 @@ import type {
   MediaItem,
   SemanticText,
   SeoMetadata,
+  Slice,
   TableData,
 } from "../utils/types";
 
@@ -20,9 +21,10 @@ export interface RichTextBlock {
 export interface ArticleData {
   article_title: SemanticText;
   article_date: string; // Formato de data (geralmente 'YYYY-MM-DD' ou ISO string)
-  article_banner: MediaItem;
-  article_main_content: RichTextBlock;
+  article_banner: MediaItem; // URL da imagem do banner
+  article_main_content: RichTextBlock; // Doc JSON do tiptap
   table?: TableData;
+  slices?: Slice[];
 }
 
 const ARTICLE_ENDPOINT = "artigos";
@@ -35,11 +37,7 @@ export function useArticle(slug: string | undefined) {
   const [error, setError] = useState<Error | null>(null);
 
   const fetchArticle = useCallback(
-    async (
-      currentSlug: string,
-      currentLang: string,
-      signal?: AbortSignal,
-    ) => {
+    async (currentSlug: string, currentLang: string, signal?: AbortSignal) => {
       setIsLoading(true);
       setError(null);
       try {
@@ -49,7 +47,7 @@ export function useArticle(slug: string | undefined) {
           currentLang,
           { signal },
         );
-        setData(result.data as ArticleData);
+        setData(result.data as unknown as ArticleData);
         setSeo(result.seo as SeoMetadata | undefined);
       } catch (err) {
         if (err instanceof Error && err.name === "CanceledError") return;

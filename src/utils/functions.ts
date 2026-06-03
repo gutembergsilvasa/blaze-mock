@@ -1,6 +1,5 @@
 // Parser markdown simples (sem lib externa)
 export function parseMarkdown(md: string): string {
-  console.log({ md });
   return (
     md
       // Headers

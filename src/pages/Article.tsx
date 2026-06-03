@@ -1,32 +1,12 @@
 import { useParams } from "react-router-dom";
-import { EditorContent, type Content } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import { TextStyleKit } from "@tiptap/extension-text-style";
+import { type Content } from "@tiptap/react";
 
 import { useArticle } from "../hooks/useArticle";
 import { Seo } from "../components/Seo";
 import { Table } from "../components/Table";
-
-import { Editor } from "@tiptap/core";
-import { Markdown } from "@tiptap/markdown";
-
-function RenderTiptapContent({ content }: { content: Content }) {
-  const editor = new Editor({
-    editable: false,
-    extensions: [StarterKit, Link, Markdown, TextStyleKit],
-    editorProps: {
-      attributes: {
-        class:
-          "prose prose-invert max-w-none text-sm leading-relaxed text-blaze-muted",
-      },
-    },
-    content,
-    contentType: "markdown",
-  });
-
-  return <EditorContent editor={editor} />;
-}
+import { RichText } from "../components/RichText";
+import { ArticleSliceRenderer } from "../components/ArticleSliceRenderer";
+import type { MediaItem } from "../utils/types";
 
 const fallback = {
   title:
@@ -38,24 +18,48 @@ const fallback = {
   },
 };
 
+function ArticleBanner({ banner }: { banner: MediaItem }) {
+  return (
+    <div className="p-5">
+      {banner.url ? (
+        <picture>
+          {banner.mobile && (
+            <source media="(max-width: 768px)" srcSet={banner.mobile.url} />
+          )}
+          <img
+            src={banner.url}
+            alt={banner.alt}
+            className="aspect-[16/10] w-full object-cover lg:aspect-auto lg:h-full"
+          />
+        </picture>
+      ) : (
+        <div
+          aria-hidden="true"
+          className="aspect-[16/10] w-full bg-blaze-surface-2 lg:aspect-auto lg:h-full"
+        />
+      )}
+    </div>
+  );
+}
+
 function Article() {
   const { slug } = useParams<{ slug: string }>();
   const { data, seo } = useArticle(slug);
 
-  const title = data?.article_title.text ?? fallback.title;
+  const title = data?.article_title?.text ?? fallback.title;
   const date = data?.article_date ?? fallback.date;
-  const banner = data?.article_banner?.url;
-  const bannerMobile = data?.article_banner?.mobile?.url;
-  const bannerAlt = data?.article_banner?.alt ?? "";
+  const banner = data?.article_banner.url;
   const shareUrls = fallback.shareUrls;
   const content = data?.article_main_content;
   const table = data?.table;
+  const slices = data?.slices;
+  const hasSlices = Array.isArray(slices) && slices.length > 0;
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-8">
       <Seo
         seo={seo}
-        fallbackTitle={data?.article_title.text}
+        fallbackTitle={data?.article_title?.text}
         fallbackImage={banner}
         url={typeof window !== "undefined" ? window.location.href : undefined}
       />
@@ -97,32 +101,25 @@ function Article() {
         </div>
       </header>
 
-      {banner ? (
-        <figure className="mt-8">
-          <picture>
-            {bannerMobile && (
-              <source media="(max-width: 768px)" srcSet={bannerMobile} />
-            )}
-            <img
-              src={banner}
-              alt={bannerAlt}
-              className="aspect-[16/9] w-full overflow-hidden rounded-lg bg-blaze-surface-2"
-            />
-          </picture>
-        </figure>
-      ) : null}
+      {banner ? <ArticleBanner banner={data?.article_banner} /> : null}
 
-      {content ? (
-        <div className="mx-auto mt-8 max-w-2xl">
-          <RenderTiptapContent content={content as Content} />
-        </div>
-      ) : null}
+      {hasSlices ? (
+        <ArticleSliceRenderer slices={slices} />
+      ) : (
+        <>
+          {content ? (
+            <div className="mx-auto mt-8 max-w-2xl">
+              <RichText content={content as Content} />
+            </div>
+          ) : null}
 
-      {table ? (
-        <div className="mx-auto mt-4 max-w-2xl">
-          <Table table={table} />
-        </div>
-      ) : null}
+          {table ? (
+            <div className="mx-auto mt-4 max-w-2xl">
+              <Table table={table} />
+            </div>
+          ) : null}
+        </>
+      )}
     </article>
   );
 }

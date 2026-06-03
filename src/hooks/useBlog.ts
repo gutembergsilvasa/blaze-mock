@@ -10,6 +10,7 @@ import type {
   DeliveryAPIPayload,
   MediaItem,
   SemanticText,
+  Slice,
 } from "../utils/types";
 
 export type BlogPostData = {
@@ -17,6 +18,7 @@ export type BlogPostData = {
   banner_principal_data?: string;
   banner_principal_texto?: SemanticText;
   banner_principal_descricao?: SemanticText;
+  slices?: Slice[];
 };
 
 export type BlogArticle = {

@@ -73,7 +73,7 @@ function Blog() {
 
   const postData = data?.data as BlogPostData | undefined;
   const seo = data?.seo as SeoMetadata | undefined;
-  console.log({ articles });
+
   const visible = articles;
 
   const banner_principal_data = postData?.banner_principal_data ?? "";
